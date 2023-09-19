@@ -15,6 +15,11 @@ void Oversampling::setOversamplingFactor(int factor, int blockSize)
     oversampledBuffer.setSize(1, blockSize * oversamplingFactor);
 }
 
+int Oversampling::getOversamplingFactor() const
+{
+    return oversamplingFactor;
+}
+
 void Oversampling::processOversampledBlock(AudioBuffer<float>& buffer)
 {
     auto numChannels = buffer.getNumChannels();
@@ -52,4 +57,9 @@ void Oversampling::copyOversampledToBuffer(AudioBuffer<float>& buffer)
             channelData[sample] = oversampledData[sample * oversamplingFactor];
         }
     }
+}
+
+void Oversampling::reset()
+{
+    oversampledBuffer.clear();
 }

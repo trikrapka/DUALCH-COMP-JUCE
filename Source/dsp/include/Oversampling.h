@@ -11,6 +11,9 @@ public:
     void setOversamplingFactor(int factor, int blockSize);
     void processOversampledBlock(AudioBuffer<float>& buffer);
     void copyOversampledToBuffer(AudioBuffer<float>& buffer);
+    void reset();
+
+    int getOversamplingFactor() const;
 
 private:
     int oversamplingFactor;
