@@ -6,7 +6,7 @@
 
 ![my badge](https://badgen.net/badge/Framework/JUCE/yellow)
 
-![Plugin](https://github.com/trikrapka/DualChannelCompressorJuce/blob/main/plugin.png)
+![Plugin](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/plugin.png)
 
 <h2>Fetures:</h2>
 <h4>L/R & M/S Mode</h4>
@@ -32,4 +32,4 @@ Display Gain Reduction and Output Level meters for each channel
 Support for AU and VST3 formats on both Windows and macOS
 <h2>Scheme:</h2>
 
-![Scheme](https://github.com/trikrapka/DualChannelCompressorJuce/blob/main/scheme.jpg)
+![Scheme](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/scheme.jpg)
