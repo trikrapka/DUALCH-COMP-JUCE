@@ -24,8 +24,7 @@
 /**
 */
 class DualChannelAudioProcessorEditor : public AudioProcessorEditor, Timer,
-    Slider::Listener, Button::Listener, ComboBox::Listener,
-    private AsyncUpdater
+    Slider::Listener, Button::Listener, ComboBox::Listener
 {
 public:
     DualChannelAudioProcessorEditor(DualChannelAudioProcessor&, AudioProcessorValueTreeState&);
@@ -37,8 +36,6 @@ public:
     void timerCallback() override;
     void initWidgets();
     void sliderValueChanged(juce::Slider* slider);
-
-    void handleAsyncUpdate() override;
 
     void buttonClicked(Button* button) override;
 

@@ -59,15 +59,6 @@ void DualChannelAudioProcessorEditor::timerCallback()
     rightGainMeter.update(rightGainReduction);
 }
 
-void DualChannelAudioProcessorEditor::handleAsyncUpdate()
-{
-    float leftGainReduction = processor.getLeftGainReduction();
-    float rightGainReduction = processor.getRightGainReduction();
-
-    leftGainMeter.update(leftGainReduction);
-    rightGainMeter.update(rightGainReduction);
-}
-
 //==============================================================================
 void DualChannelAudioProcessorEditor::paint(Graphics& g)
 {
