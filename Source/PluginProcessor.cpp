@@ -22,7 +22,8 @@ DualChannelAudioProcessor::DualChannelAudioProcessor()
 	leftCompressor(), rightCompressor(),
 	linkInputGainComputer(), linkOutputGainComputer(),
 	linkCompressor(),
-	dryWetMixer()
+	dryWetMixer(),
+	leftGainReduction(0.0f), rightGainReduction(0.0f)
 #endif
 {
 	parameters.addParameterListener("f_inputgain", this);
@@ -132,7 +133,7 @@ void DualChannelAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 {
 	ProcessSpec spec1{};
 	spec1.sampleRate = sampleRate;
-	spec1.numChannels = 1;
+	spec1.numChannels = 3;
 	spec1.maximumBlockSize = samplesPerBlock;
 
 	leftInputGainComputer.prepare(spec1);
@@ -145,7 +146,7 @@ void DualChannelAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 
 	ProcessSpec spec2{};
 	spec2.sampleRate = sampleRate;
-	spec2.numChannels = 2;
+	spec2.numChannels = 4;
 	spec2.maximumBlockSize = samplesPerBlock;
 
 	linkInputGainComputer.prepare(spec2);
@@ -162,6 +163,11 @@ void DualChannelAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 
 	linkInputGainComputer.setGainDecibels(0);
 	linkOutputGainComputer.setGainDecibels(0);
+
+	leftCompressor.setRelease(5);
+	rightCompressor.setRelease(5);
+
+	linkCompressor.setRelease(5);
 
 	dryWetMixer.setWetMixProportion(1);
 }
@@ -346,8 +352,11 @@ void DualChannelAudioProcessor::process(AudioBuffer<float> buffer)
 			leftWriteData[i] = processedLeftSample;
 			rightWriteData[i] = processedRightSample;
 
-			leftGainReduction.set(Decibels::gainToDecibels(processedLeftSample / leftSample));
-			rightGainReduction.set(Decibels::gainToDecibels(processedRightSample / rightSample));
+			if (leftSample == 0) leftGainReduction.set(0);
+			else leftGainReduction.set(Decibels::gainToDecibels(processedLeftSample / leftSample));
+
+			if (rightSample == 0) rightGainReduction.set(0);
+			else rightGainReduction.set(Decibels::gainToDecibels(processedRightSample / rightSample));
 		}
 	}
 }
@@ -372,6 +381,12 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	AudioBlock<float> audioBlock(buffer);
 
 	dryWetMixer.pushDrySamples(audioBlock);
+
+	/*Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandFIREquiripple);
+	if (applyOversampling)
+	{
+		oversampling.processSamplesUp(audioBlock);
+	}*/
 
 	if (applyLRMode)
 	{

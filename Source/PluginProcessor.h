@@ -88,8 +88,8 @@ public:
 
 private:
     //==============================================================================
-    Atomic<float> leftGainReduction = 0.0f;
-    Atomic<float> rightGainReduction = 0.0f;
+    Atomic<float> leftGainReduction;
+    Atomic<float> rightGainReduction;
     //==============================================================================
     float hightPassValue = 6.0f;
     float lowPassValue = 6.0f;
