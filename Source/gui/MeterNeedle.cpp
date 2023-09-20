@@ -6,8 +6,8 @@ MeterNeedle::MeterNeedle()
 {
     valueInDecibel = 0.0f;
     mode = 3;
-    minValue = -48.0f;
-    maxValue = 48.0f;
+    minValue = -80.0f;
+    maxValue = 80.0f;
     sAngle = 0.0f;
     eAngle = 0.0f;
     statusOutline = Colour(Constants::Colors::statusOutline);
