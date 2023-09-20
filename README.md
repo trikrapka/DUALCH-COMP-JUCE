@@ -5,7 +5,7 @@
 ![my badge](https://badgen.net/badge/Framework/JUCE/orange)
 ![my badge](https://badgen.net/badge/Version/1.0.0.0/pink)
 
-![Plugin](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/Additions/plugin.png | width=400)
+<img src="https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/Additions/plugin.png" width="800">
 
 ## Features
 - Input/Output Gain
@@ -45,4 +45,4 @@
 
 ### Scheme of the compressor:
 
-![Scheme of the compressor:](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/Additions/Base-diagram.png)
+![Scheme of the compressor:](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/Additions/Base-Diagram.png)
