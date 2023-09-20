@@ -367,12 +367,12 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 
 	if (applyHighPass)
 	{
-		filter.get<0>().coefficients = dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 5000.0f, hightPassValue); // 5 kHz
+		filter.get<0>().coefficients = dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 20.0f, hightPassValue); // 20 Hz
 	}
 
 	if (applyLowPass)
 	{
-		filter.get<1>().coefficients = dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 200.0f, lowPassValue); // 200 Hz
+		filter.get<1>().coefficients = dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, 10000.0f, lowPassValue); // 10 kHz
 	}
 
 	dryWetMixer.pushDrySamples(audioBlock);
