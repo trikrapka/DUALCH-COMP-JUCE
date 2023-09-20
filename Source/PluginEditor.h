@@ -23,8 +23,8 @@
 //==============================================================================
 /**
 */
-class DualChannelAudioProcessorEditor : public AudioProcessorEditor, Timer, Slider::Listener,
-    Button::Listener,
+class DualChannelAudioProcessorEditor : public AudioProcessorEditor, Timer,
+    Slider::Listener, Button::Listener, ComboBox::Listener,
     private AsyncUpdater
 {
 public:
@@ -41,6 +41,8 @@ public:
     void handleAsyncUpdate() override;
 
     void buttonClicked(Button* button) override;
+
+    void comboBoxChanged(ComboBox* comboBox) override;
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -81,6 +83,9 @@ private:
     LabeledSlider mixSlider;
     ToggleButton lrToggle;
     ToggleButton linkingToggle;
+
+    ComboBox oversamplingComboBox;
+    ToggleButton oversamplingToggle;
 
     bool linkingApplied; //private bool to refer to applyLinking bool
     double clicked;

@@ -20,7 +20,8 @@ DualChannelAudioProcessorEditor::DualChannelAudioProcessorEditor(DualChannelAudi
     highPassToggle("HP"), lowPassToggle("LP"),
     sidechainSlider(this), sidechainToggle("Sidechain"),
     mixSlider(this),
-    lrToggle("MS mode"), linkingToggle("Linking")
+    lrToggle("MS mode"), linkingToggle("Linking"),
+    oversamplingComboBox("Oversampling factor"), oversamplingToggle("Oversampling")
 {
     setLookAndFeel(&LAF);
     initWidgets();
@@ -132,6 +133,9 @@ void DualChannelAudioProcessorEditor::resized()
     filterButtonsBox.items.add(FlexItem(lowPassSlider).withFlex(1).withMargin(knobMarginSmall));
     filterButtonsBox.items.add(FlexItem(lowPassToggle).withFlex(1).withMargin(knobMarginSmall));
 
+    filterButtonsBox.items.add(FlexItem(oversamplingComboBox).withFlex(1).withMargin(knobMarginSmall));
+    filterButtonsBox.items.add(FlexItem(oversamplingToggle).withFlex(1).withMargin(knobMarginSmall));
+
     filterButtonsBox.performLayout(filtersButtonsArea.toFloat());
 
     FlexBox otherButtonsBox;
@@ -222,6 +226,18 @@ void DualChannelAudioProcessorEditor::buttonClicked(Button* button)
     {
         processor.toggleLR();
     }
+    else if (button == &oversamplingToggle)
+    {
+        // TODO: implement
+    }
+}
+
+void DualChannelAudioProcessorEditor::comboBoxChanged(ComboBox* comboBox)
+{
+    if (comboBox == &oversamplingComboBox)
+    {
+        // TODO: implement
+    }
 }
 
 void DualChannelAudioProcessorEditor::initWidgets()
@@ -307,4 +323,13 @@ void DualChannelAudioProcessorEditor::initWidgets()
 
     addAndMakeVisible(linkingToggle);
     linkingToggle.addListener(this);
+
+    addAndMakeVisible(oversamplingComboBox);
+    oversamplingComboBox.addItem("2", 0);
+    oversamplingComboBox.addItem("4", 1);
+    oversamplingComboBox.addItem("8", 2);
+    oversamplingComboBox.addListener(this);
+
+    addAndMakeVisible(oversamplingToggle);
+    oversamplingToggle.addListener(this);
 }
