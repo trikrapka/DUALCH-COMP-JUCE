@@ -360,6 +360,7 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	const double sampleRate = getSampleRate();
 
 	AudioBuffer<float> mainBuffer = getBusBuffer(buffer, true, 0);
+	AudioBlock<float> audioBlock(mainBuffer);
 
 	dsp::ProcessorChain<dsp::IIR::Filter<float>, dsp::IIR::Filter<float>> filter;
 	Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR);
@@ -373,8 +374,6 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	{
 		filter.get<1>().coefficients = dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 200.0f, lowPassValue); // 200 Hz
 	}
-
-	AudioBlock<float> audioBlock(mainBuffer);
 
 	dryWetMixer.pushDrySamples(audioBlock);
 
@@ -412,36 +411,27 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 
 	if (applySidechain && !JUCEApplicationBase::isStandaloneApp())
 	{
-		AudioBuffer<float> sidechainBuffer(2, numSamples);
-		sidechainBuffer.copyFrom(0, 0, buffer.getReadPointer(2), numSamples);
-		sidechainBuffer.copyFrom(1, 0, buffer.getReadPointer(3), numSamples);
+		AudioBuffer<float> sidechainBuffer = getBusBuffer(buffer, true, 1);
 		AudioBlock<float> sidechainBlock(sidechainBuffer);
 		ProcessContextReplacing<float> sidechainContextReplacing(sidechainBlock);
 
 		sidechainGainComputer.process(sidechainContextReplacing);
 
-		auto leftInputChannelData = buffer.getReadPointer(0);
-		auto rightInputChannelData = buffer.getReadPointer(1);
-
-		auto leftOutputChannelData = buffer.getWritePointer(0);
-		auto rightOutputChannelData = buffer.getWritePointer(1);
-
-		auto leftSidechainChannelData = sidechainBuffer.getReadPointer(0);
-		auto rightSidechainChannelData = sidechainBuffer.getReadPointer(1);
+		AudioBlock<float> mainBlock(mainBuffer);
 
 		for (int i = 0; i < numSamples; i++)
 		{
-			float leftSample = leftInputChannelData[i];
-			float rightSample = rightInputChannelData[i];
+			float leftSample = mainBlock.getSample(0, i);
+			float rightSample = mainBlock.getSample(1, i);
 
-			float leftSidechainSample = leftSidechainChannelData[i];
-			float rightSidechainSample = rightSidechainChannelData[i];
+			float leftSidechainSample = sidechainBlock.getSample(0, i);
+			float rightSidechainSample = sidechainBlock.getSample(1, i);
 
 			float resultLeftSample = leftSample + leftSidechainSample;
 			float resultRightSample = rightSample + rightSidechainSample;
 
-			leftOutputChannelData[i] = resultLeftSample;
-			rightOutputChannelData[i] = resultRightSample;
+			mainBlock.setSample(0, i, resultLeftSample);
+			mainBlock.setSample(1, i, resultRightSample);
 		}
 	}
 }
