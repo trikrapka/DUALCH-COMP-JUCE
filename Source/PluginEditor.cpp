@@ -228,7 +228,7 @@ void DualChannelAudioProcessorEditor::buttonClicked(Button* button)
     }
     else if (button == &oversamplingToggle)
     {
-        // TODO: implement
+        processor.toggleOversampling();
     }
 }
 
@@ -236,7 +236,15 @@ void DualChannelAudioProcessorEditor::comboBoxChanged(ComboBox* comboBox)
 {
     if (comboBox == &oversamplingComboBox)
     {
-        // TODO: implement
+        int selectedId = comboBox->getSelectedId();
+
+        switch (selectedId)
+        {
+        case 1: processor.setOversamplingFactor(2.0f);
+        case 2: processor.setOversamplingFactor(4.0f);
+        case 3: processor.setOversamplingFactor(8.0f);
+        default: return;
+        }
     }
 }
 
@@ -325,10 +333,11 @@ void DualChannelAudioProcessorEditor::initWidgets()
     linkingToggle.addListener(this);
 
     addAndMakeVisible(oversamplingComboBox);
-    oversamplingComboBox.addItem("2", 0);
-    oversamplingComboBox.addItem("4", 1);
-    oversamplingComboBox.addItem("8", 2);
+    oversamplingComboBox.addItem("2", 1);
+    oversamplingComboBox.addItem("4", 2);
+    oversamplingComboBox.addItem("8", 3);
     oversamplingComboBox.addListener(this);
+    oversamplingComboBox.setSelectedId(1);
 
     addAndMakeVisible(oversamplingToggle);
     oversamplingToggle.addListener(this);

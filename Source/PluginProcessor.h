@@ -74,6 +74,9 @@ public:
     void toggleHighPass();
     void toggleLowPass();
     void toggleSidechain();
+    void toggleOversampling();
+
+    void setOversamplingFactor(float value);
 
     void setHighPass(float value);
     void setLowPass(float value);
@@ -91,8 +94,11 @@ private:
     float hightPassValue = 6.0f;
     float lowPassValue = 6.0f;
     //==============================================================================
+    float oversamplingFactor = 2.0f;
+    //==============================================================================
     bool applyLRMode = true;
     bool applySidechain = false;
+    bool applyOversampling = false;
     //==============================================================================
     bool applyHighPass = false;
     bool applyLowPass = false;

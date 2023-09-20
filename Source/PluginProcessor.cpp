@@ -226,6 +226,11 @@ void DualChannelAudioProcessor::setLowPass(float value)
 	lowPassValue = value;
 }
 
+void DualChannelAudioProcessor::setOversamplingFactor(float value)
+{
+	oversamplingFactor = value;
+}
+
 void DualChannelAudioProcessor::toggleLR()
 {
 	applyLRMode = !applyLRMode;
@@ -249,6 +254,11 @@ void DualChannelAudioProcessor::toggleLowPass()
 void DualChannelAudioProcessor::toggleSidechain()
 {
 	applySidechain = !applySidechain;
+}
+
+void DualChannelAudioProcessor::toggleOversampling()
+{
+	applyOversampling = !applyOversampling;
 }
 
 void encodeMS(float* const* samples, int numSamples, int ch0) noexcept
