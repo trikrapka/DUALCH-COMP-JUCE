@@ -232,7 +232,7 @@ void DualChannelAudioProcessor::setLowPass(float value)
 	lowPassValue = value;
 }
 
-void DualChannelAudioProcessor::setOversamplingFactor(float value)
+void DualChannelAudioProcessor::setOversamplingFactor(int value)
 {
 	oversamplingFactor = value;
 }
@@ -267,65 +267,50 @@ void DualChannelAudioProcessor::toggleOversampling()
 	applyOversampling = !applyOversampling;
 }
 
-void encodeLRToMS(AudioBuffer<float> buffer)
+void encodeLRToMS(AudioBlock<float> block)
 {
-	const int numSamples = buffer.getNumSamples();
-
-	auto leftReadData = buffer.getReadPointer(0);
-	auto rightReadData = buffer.getReadPointer(1);
-	auto leftWriteData = buffer.getWritePointer(0);
-	auto rightWriteData = buffer.getWritePointer(1);
+	const int numSamples = block.getNumSamples();
 
 	for (int i = 0; i < numSamples; i++)
 	{
-		float leftSample = leftReadData[i];
-		float rightSample = rightReadData[i];
+		float leftSample = block.getSample(0, i);
+		float rightSample = block.getSample(1, i);
 
 		float midSample = (leftSample + rightSample) * 0.5f;
 		float sideSample = (leftSample - rightSample) * 0.5f;
 
-		leftWriteData[i] = midSample;
-		rightWriteData[i] = sideSample;
+		block.setSample(0, i, midSample);
+		block.setSample(1, i, sideSample);
 	}
 }
 
-void decodeMSToLR(AudioBuffer<float> buffer)
+void decodeMSToLR(AudioBlock<float> block)
 {
-	const int numSamples = buffer.getNumSamples();
-
-	auto leftReadData = buffer.getReadPointer(0);
-	auto rightReadData = buffer.getReadPointer(1);
-	auto leftWriteData = buffer.getWritePointer(0);
-	auto rightWriteData = buffer.getWritePointer(1);
+	const int numSamples = block.getNumSamples();
 
 	for (int i = 0; i < numSamples; i++)
 	{
-		float midSample = leftReadData[i];
-		float sideSample = rightReadData[i];
+		float midSample = block.getSample(0, i);
+		float sideSample = block.getSample(1, i);
 
 		float leftSample = midSample + sideSample;
 		float rightSample = midSample - sideSample;
 
-		leftWriteData[i] = leftSample;
-		rightWriteData[i] = rightSample;
+		block.setSample(0, i, leftSample);
+		block.setSample(1, i, rightSample);
 	}
 }
 
-void DualChannelAudioProcessor::process(AudioBuffer<float> buffer)
+void DualChannelAudioProcessor::process(AudioBlock<float> block)
 {
-	const int numSamples = buffer.getNumSamples();
+	const int numSamples = block.getNumSamples();
 
 	if (applyLinking)
 	{
-		auto leftReadData = buffer.getReadPointer(0);
-		auto rightReadData = buffer.getReadPointer(1);
-		auto leftWriteData = buffer.getWritePointer(0);
-		auto rightWriteData = buffer.getWritePointer(1);
-
 		for (int i = 0; i < numSamples; i++)
 		{
-			float leftSample = leftReadData[i];
-			float rightSample = rightReadData[i];
+			float leftSample = block.getSample(0, i);
+			float rightSample = block.getSample(1, i);
 
 			float processedLeftSample = linkInputGainComputer.processSample(leftSample);
 			processedLeftSample = linkCompressor.processSample(0, processedLeftSample);
@@ -335,24 +320,19 @@ void DualChannelAudioProcessor::process(AudioBuffer<float> buffer)
 			processedRightSample = linkCompressor.processSample(1, processedRightSample);
 			processedRightSample = linkOutputGainComputer.processSample(processedRightSample);
 
-			leftWriteData[i] = processedLeftSample;
-			rightWriteData[i] = processedRightSample;
+			block.setSample(0, i, processedLeftSample);
+			block.setSample(1, i, processedRightSample);
 
 			leftGainReduction.set(Decibels::gainToDecibels(processedLeftSample / leftSample));
 			rightGainReduction.set(Decibels::gainToDecibels(processedRightSample / rightSample));
 		}
 	}
 	else
-	{		
-		auto leftReadData = buffer.getReadPointer(0);
-		auto rightReadData = buffer.getReadPointer(1);
-		auto leftWriteData = buffer.getWritePointer(0);
-		auto rightWriteData = buffer.getWritePointer(1);
-
+	{
 		for (int i = 0; i < numSamples; i++)
 		{
-			float leftSample = leftReadData[i];
-			float rightSample = rightReadData[i];
+			float leftSample = block.getSample(0, i);
+			float rightSample = block.getSample(1, i);
 
 			float processedLeftSample = leftInputGainComputer.processSample(leftSample);
 			processedLeftSample = leftCompressor.processSample(0, processedLeftSample);
@@ -362,8 +342,8 @@ void DualChannelAudioProcessor::process(AudioBuffer<float> buffer)
 			processedRightSample = rightCompressor.processSample(0, processedRightSample);
 			processedRightSample = rightOutputGainComputer.processSample(processedRightSample);
 
-			leftWriteData[i] = processedLeftSample;
-			rightWriteData[i] = processedRightSample;
+			block.setSample(0, i, processedLeftSample);
+			block.setSample(1, i, processedRightSample);
 
 			if (leftSample == 0) leftGainReduction.set(0);
 			else leftGainReduction.set(Decibels::gainToDecibels(processedLeftSample / leftSample));
@@ -379,7 +359,10 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	const int numSamples = buffer.getNumSamples();
 	const double sampleRate = getSampleRate();
 
+	AudioBuffer<float> mainBuffer = getBusBuffer(buffer, true, 0);
+
 	dsp::ProcessorChain<dsp::IIR::Filter<float>, dsp::IIR::Filter<float>> filter;
+	Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR);
 
 	if (applyHighPass)
 	{
@@ -391,30 +374,38 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 		filter.get<1>().coefficients = dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 200.0f, lowPassValue); // 200 Hz
 	}
 
-	AudioBlock<float> audioBlock(buffer);
+	AudioBlock<float> audioBlock(mainBuffer);
 
 	dryWetMixer.pushDrySamples(audioBlock);
 
-	/*Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandFIREquiripple);
 	if (applyOversampling)
 	{
-		oversampling.processSamplesUp(audioBlock);
-	}*/
+		oversampling.initProcessing(numSamples);
+		AudioBlock<float> upsampledBlock = oversampling.processSamplesUp(mainBuffer);
+		audioBlock.swap(upsampledBlock);
+	}
 
 	if (applyLRMode)
 	{
-		process(buffer);
+		process(audioBlock);
 	}
 	else
 	{
-		encodeLRToMS(buffer);
-		process(buffer);
-		decodeMSToLR(buffer);
+		encodeLRToMS(audioBlock);
+		process(audioBlock);
+		decodeMSToLR(audioBlock);
 	}
 
 	if (applyHighPass || applyLowPass)
 	{
 		filter.process(ProcessContextReplacing<float>(audioBlock));
+	}
+
+	if (applyOversampling)
+	{
+		AudioBlock<float> downsampledBlock(mainBuffer);
+		oversampling.processSamplesDown(downsampledBlock);
+		audioBlock.swap(downsampledBlock);
 	}
 
 	dryWetMixer.mixWetSamples(audioBlock);

@@ -66,7 +66,7 @@ public:
     void parameterChanged(const String& parameterID, float newValue) override;
     AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-    void process(AudioBuffer<float> buffer);
+    void process(AudioBlock<float> block);
 
     //==============================================================================
     void toggleLinking();
@@ -76,7 +76,7 @@ public:
     void toggleSidechain();
     void toggleOversampling();
 
-    void setOversamplingFactor(float value);
+    void setOversamplingFactor(int value);
 
     void setHighPass(float value);
     void setLowPass(float value);
@@ -91,10 +91,10 @@ private:
     Atomic<float> leftGainReduction;
     Atomic<float> rightGainReduction;
     //==============================================================================
+    int oversamplingFactor = 1;
+    //==============================================================================
     float hightPassValue = 6.0f;
     float lowPassValue = 6.0f;
-    //==============================================================================
-    float oversamplingFactor = 2.0f;
     //==============================================================================
     bool applyLRMode = true;
     bool applySidechain = false;

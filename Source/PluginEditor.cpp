@@ -231,10 +231,10 @@ void DualChannelAudioProcessorEditor::comboBoxChanged(ComboBox* comboBox)
 
         switch (selectedId)
         {
-        case 1: processor.setOversamplingFactor(2.0f);
-        case 2: processor.setOversamplingFactor(4.0f);
-        case 3: processor.setOversamplingFactor(8.0f);
-        default: return;
+        case 1: { processor.setOversamplingFactor(1); break; }
+        case 2: { processor.setOversamplingFactor(2); break; }
+        case 3: { processor.setOversamplingFactor(4); break; }
+        default: break;
         }
     }
 }
