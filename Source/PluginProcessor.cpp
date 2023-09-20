@@ -267,34 +267,47 @@ void DualChannelAudioProcessor::toggleOversampling()
 	applyOversampling = !applyOversampling;
 }
 
-void encodeMS(float* const* samples, int numSamples, int ch0) noexcept
+void encodeLRToMS(AudioBuffer<float> buffer)
 {
-	const auto ch1 = ch0 + 1;
+	const int numSamples = buffer.getNumSamples();
 
-	for (auto s = 0; s < numSamples; ++s)
+	auto leftReadData = buffer.getReadPointer(0);
+	auto rightReadData = buffer.getReadPointer(1);
+	auto leftWriteData = buffer.getWritePointer(0);
+	auto rightWriteData = buffer.getWritePointer(1);
+
+	for (int i = 0; i < numSamples; i++)
 	{
-		const auto mid = samples[ch0][s] + samples[ch1][s];
-		const auto side = samples[ch0][s] - samples[ch1][s];
+		float leftSample = leftReadData[i];
+		float rightSample = rightReadData[i];
 
-		samples[ch0][s] = mid;
-		samples[ch1][s] = side;
+		float midSample = (leftSample + rightSample) * 0.5f;
+		float sideSample = (leftSample - rightSample) * 0.5f;
+
+		leftWriteData[i] = midSample;
+		rightWriteData[i] = sideSample;
 	}
-
-	for (auto ch = ch0; ch < ch0 + 2; ++ch)
-		FloatVectorOperations::multiply(samples[ch], .5f, numSamples);
 }
 
-void decodeMS(float* const* samples, int numSamples, int ch0) noexcept
+void decodeMSToLR(AudioBuffer<float> buffer)
 {
-	const auto ch1 = ch0 + 1;
+	const int numSamples = buffer.getNumSamples();
 
-	for (auto s = 0; s < numSamples; ++s)
+	auto leftReadData = buffer.getReadPointer(0);
+	auto rightReadData = buffer.getReadPointer(1);
+	auto leftWriteData = buffer.getWritePointer(0);
+	auto rightWriteData = buffer.getWritePointer(1);
+
+	for (int i = 0; i < numSamples; i++)
 	{
-		const auto left = samples[ch0][s] + samples[ch1][s];
-		const auto right = samples[ch0][s] - samples[ch1][s];
+		float midSample = leftReadData[i];
+		float sideSample = rightReadData[i];
 
-		samples[ch0][s] = left;
-		samples[ch1][s] = right;
+		float leftSample = midSample + sideSample;
+		float rightSample = midSample - sideSample;
+
+		leftWriteData[i] = leftSample;
+		rightWriteData[i] = rightSample;
 	}
 }
 
@@ -394,9 +407,9 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	}
 	else
 	{
-		encodeMS(buffer.getArrayOfWritePointers(), numSamples, 0);
+		encodeLRToMS(buffer);
 		process(buffer);
-		decodeMS(buffer.getArrayOfWritePointers(), numSamples, 0);
+		decodeMSToLR(buffer);
 	}
 
 	if (applyHighPass || applyLowPass)
