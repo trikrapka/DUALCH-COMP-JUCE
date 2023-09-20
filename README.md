@@ -1,35 +1,48 @@
-# DualChannelCompressor
+# Dual Channel Compressor 
 
-![my badge](https://badgen.net/badge/PL/C++/blue)
+![my badge](https://badgen.net/badge/Language/C++/blue)
+![my badge](https://badgen.net/badge/Format/VST3/green)
+![my badge](https://badgen.net/badge/Framework/JUCE/orange)
+![my badge](https://badgen.net/badge/Version/1.0.0.0/pink)
 
-![my badge](https://badgen.net/badge/Format/VST3_plug-in/green)
+![Plugin](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/Additions/plugin.png | width=400)
 
-![my badge](https://badgen.net/badge/Framework/JUCE/yellow)
+## Features
+- Input/Output Gain
+- Threshold/Ratio
+- Attack/Release
+- Mix
+- Metering (Gain Reduction)
+- Sidechain
+- Linking
+- MidSide mode
+- High/Low Pass Filters
+- Oversampling
 
-![Plugin](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/plugin.png)
+## Manual
+#### General
+- **Input:** The Input knob adjusts the level of the signal before any processing happens. Driving the input signal harder into the compressor can be used as an alternative to lowering the threshold.
+- **Output:** The Output knob adjusts the level of the signal after processing happens.
+- **Mix:** The Mix knob enables you to mix between the dry and processed signal. This can be used for parallel processing and enables use-cases like NY-Style drum compression. 
+  
+#### Gain Computer
+- **Threshold:** The Threshold knob adjusts the level above which the compressor starts attenuating the input signal. The Input knob alternatively can be used to drive the signal harder into the compressor, resulting in a less low threshold being needed. Be careful to not drive the signal too hard or it'll start clipping.
+- **Ratio:** The Ratio knob determines how much the signal is attenuated above the chosen threshold. For a ratio of 4:1, one dB remains for every 4dB of input signal above the threshold. At a ratio of 1:1 no compression is happening, as the input is exactly the output. At a ratio of inifinity:1 (knob all the way to the right) the compressor is acting as a limiter, meaning that everything above the treshold is completely compressed away.
 
-<h2>Fetures:</h2>
-<h4>L/R & M/S Mode</h4>
-Parameters: Input Gain, Threshold, Ratio (2, 4, 6, 8, 10:1), Attack (1-640ms), Release (5-5000ms), Output Gain
-<h4>Sidechain Support:</h4>
+#### Ballistics
+- **Attack:** The Attack knob sets the time that determines how fast the compression will set in once the signal exceeds the threshold. Generally speaking you want a rather fast attack time for transient-rich signals like drums to minimize overshoot. 
+- **Release:** The Release knob sets the time that determines how fast the compressor will recover from the gain reduction once the signal falls under the threshold. Depending on the input signal, short release times may introduce a "pumping" effect and/or distortion.
 
-Enable/Disable Sidechain processing using a button
-<h4>Stereo Linking:</h4>
+#### Metering
+- **Gainreduction:** This is a simple gainreduction meter.
 
-Enable/Disable Stereo Linking using a button
-<h4>High-Pass and Low-Pass Filters:</h4>
+#### Additional
+- **Sidechain** - Sidechain button enables sidechain. You can control the dB using knobs
+- **MidSide** - Button to enable MidSide mode
+- **Linking** - Button to link two channels controls
+- **Oversampling** - To sample a signal at a sampling frequency significantly higher than the Nyquist rate. Button to enable/disable. 3 options: 2x, 4x, 8x.
+- **High and Low Pass filters** - The low and high pass buttons makes it possible to cutoff frequencies. You can change the dB/oct value.
 
-Filters with 6, 12, 18, 24 dB/oct slopes
-Buttons to enable/disable High-Pass and Low-Pass filters
-<h4>Oversampling:</h4>
+### Scheme of the compressor:
 
-Options for off, 2x, 4x, and 8x oversampling
-<h4>Gain Reduction and Volume Meters:</h4>
-
-Display Gain Reduction and Output Level meters for each channel
-<h4>Plugin Formats:</h4>
-
-Support for AU and VST3 formats on both Windows and macOS
-<h2>Scheme:</h2>
-
-![Scheme](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/scheme.jpg)
+![Scheme of the compressor:](https://github.com/trikrapka/DUALCH-COMP-JUCE/blob/main/Additions/Base-diagram.png)
