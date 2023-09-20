@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="vpXkaU" name="DualChannel" projectType="audioplug" pluginFormats="buildAU,buildStandalone,buildVST3"
+<JUCERPROJECT id="vpXkaU" name="DualChannel" projectType="audioplug" pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST3"
               cppLanguageStandard="latest" reportAppUsage="0" displaySplashScreen="1"
-              jucerFormatVersion="1">
+              jucerFormatVersion="1" defines="JUCE_MODAL_LOOPS_PERMITTED=1">
   <MAINGROUP id="LEzWVi" name="DualChannel">
     <GROUP id="{85ABA220-5DDF-78C0-699F-59C19B48E4B3}" name="Fonts">
       <FILE id="Mpl2lG" name="Roboto-Bold.ttf" compile="0" resource="1" file="Fonts/Roboto-Bold.ttf"/>

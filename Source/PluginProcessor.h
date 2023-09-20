@@ -51,7 +51,6 @@ public:
     bool canAddBus(bool isInput) const override;
 
     BusesProperties makeBusesProperties();
-
     //==============================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
@@ -83,7 +82,7 @@ public:
 
     float getLeftGainReduction();
     float getRightGainReduction();
-
+    
     bool applyLinking = false;
 
 private:
@@ -99,9 +98,12 @@ private:
     bool applyLRMode = true;
     bool applySidechain = false;
     bool applyOversampling = false;
+    const AudioChannelSet sidechainInput;
     //==============================================================================
     bool applyHighPass = false;
     bool applyLowPass = false;
+    //==============================================================================
+    bool hasSidechainInput = true;
     //==============================================================================
     Gain<float> leftInputGainComputer;
     Gain<float> rightInuptGainComputer;
@@ -118,6 +120,8 @@ private:
     DryWetMixer<float> dryWetMixer;
     //==============================================================================
     AudioProcessorValueTreeState parameters;
+
+    std::unique_ptr<juce::AlertWindow> alertWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DualChannelAudioProcessor)
 };

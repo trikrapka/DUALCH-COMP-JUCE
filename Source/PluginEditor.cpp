@@ -41,6 +41,12 @@ DualChannelAudioProcessorEditor::DualChannelAudioProcessorEditor(DualChannelAudi
     secondThresholdSlider.slider.addListener(this);
     secondRatioSlider.slider.addListener(this);
     secondOutGainSlider.slider.addListener(this);
+
+    firstThresholdSlider.slider.setValue(-32);
+    firstRatioSlider.slider.setValue(2);
+    
+    secondThresholdSlider.slider.setValue(-32);
+    secondRatioSlider.slider.setValue(2);
 }
 
 
@@ -57,6 +63,7 @@ void DualChannelAudioProcessorEditor::timerCallback()
 
     leftGainMeter.update(leftGainReduction);
     rightGainMeter.update(rightGainReduction);
+    
 }
 
 //==============================================================================
@@ -124,7 +131,7 @@ void DualChannelAudioProcessorEditor::resized()
     filterButtonsBox.items.add(FlexItem(lowPassSlider).withFlex(1).withMargin(knobMarginSmall));
     filterButtonsBox.items.add(FlexItem(lowPassToggle).withFlex(1).withMargin(knobMarginSmall));
 
-    filterButtonsBox.items.add(FlexItem(oversamplingComboBox).withFlex(1).withMargin(knobMarginSmall));
+    filterButtonsBox.items.add(FlexItem(oversamplingComboBox).withFlex(1).withHeight(30).withMargin(40));
     filterButtonsBox.items.add(FlexItem(oversamplingToggle).withFlex(1).withMargin(knobMarginSmall));
 
     filterButtonsBox.performLayout(filtersButtonsArea.toFloat());

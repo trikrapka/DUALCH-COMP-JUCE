@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "dsp/include/Compressor.h"
 
 //==============================================================================
 DualChannelAudioProcessor::DualChannelAudioProcessor()
@@ -46,6 +47,7 @@ DualChannelAudioProcessor::DualChannelAudioProcessor()
 	parameters.addParameterListener("sidechain", this);
 
 	parameters.addParameterListener("mix", this);
+	//AlertWindow alertWindow("Sidechain error", "No sidechain input found.", MessageBoxIconType::WarningIcon, nullptr);
 }
 
 DualChannelAudioProcessor::~DualChannelAudioProcessor()
@@ -58,11 +60,13 @@ AudioProcessor::BusesProperties DualChannelAudioProcessor::makeBusesProperties()
 
 	bp.addBus(true, "Input", AudioChannelSet::stereo(), true);
 	bp.addBus(false, "Output", AudioChannelSet::stereo(), true);
-
-	if (!JUCEApplicationBase::isStandaloneApp())
-	{
+	
+    //TODO: delete comments
+	
+	//if (!JUCEApplicationBase::isStandaloneApp())
+	//{
 		bp.addBus(true, "Sidechain", AudioChannelSet::stereo(), true);
-	}
+	//}
 
 	return bp;
 }
@@ -166,8 +170,14 @@ void DualChannelAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 
 	leftCompressor.setRelease(5);
 	rightCompressor.setRelease(5);
-
-	linkCompressor.setRelease(5);
+	
+    leftCompressor.setThreshold(-32);
+	rightCompressor.setThreshold(-32);
+	
+	leftCompressor.setRatio(2);
+	rightCompressor.setRatio(2);
+	
+	linkCompressor.setRelease(5);	
 
 	dryWetMixer.setWetMixProportion(1);
 }
@@ -197,7 +207,9 @@ bool DualChannelAudioProcessor::isBusesLayoutSupported(const BusesLayout& layout
 		const auto sidechainIn = layouts.getChannelSet(true, 1);
 		if (!sidechainIn.isDisabled())
 			if (sidechainIn != stereo && sidechainIn != mono)
+			{
 				return false;
+			}
 	}
 
 	return true;
@@ -305,7 +317,7 @@ void DualChannelAudioProcessor::process(AudioBlock<float> block)
 {
 	const int numSamples = block.getNumSamples();
 
-	if (applyLinking)
+	if (applyLinking && !JUCEApplicationBase::isStandaloneApp())
 	{
 		for (int i = 0; i < numSamples; i++)
 		{
@@ -356,6 +368,7 @@ void DualChannelAudioProcessor::process(AudioBlock<float> block)
 
 void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
+	ScopedNoDenormals noDenormals;
 	const int numSamples = buffer.getNumSamples();
 	const double sampleRate = getSampleRate();
 
@@ -408,30 +421,43 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	}
 
 	dryWetMixer.mixWetSamples(audioBlock);
-
-	if (applySidechain && !JUCEApplicationBase::isStandaloneApp())
+	
+    //TODO: delete comment
+	
+	if (applySidechain /*  && !JUCEApplicationBase::isStandaloneApp() */)
 	{
 		AudioBuffer<float> sidechainBuffer = getBusBuffer(buffer, true, 1);
 		AudioBlock<float> sidechainBlock(sidechainBuffer);
 		ProcessContextReplacing<float> sidechainContextReplacing(sidechainBlock);
+		
+		auto sidechainInputs = sidechainBuffer.getNumChannels();
+		
+            if(sidechainInputs > 0)
+            {
+	            sidechainGainComputer.process(sidechainContextReplacing);
 
-		sidechainGainComputer.process(sidechainContextReplacing);
+            	AudioBlock<float> mainBlock(mainBuffer);
 
-		AudioBlock<float> mainBlock(mainBuffer);
+            	for (int i = 0; i < numSamples; i++)
+            	{
+            		float leftSample = mainBlock.getSample(0, i);
+            		float rightSample = mainBlock.getSample(1, i);
 
-		for (int i = 0; i < numSamples; i++)
+            		float leftSidechainSample = sidechainBlock.getSample(0, i);
+            		float rightSidechainSample = sidechainBlock.getSample(1, i);
+
+            		float resultLeftSample = leftSample + leftSidechainSample;
+            		float resultRightSample = rightSample + rightSidechainSample;
+
+            		mainBlock.setSample(0, i, resultLeftSample);
+            		mainBlock.setSample(1, i, resultRightSample);
+            	}
+            }
+		else
 		{
-			float leftSample = mainBlock.getSample(0, i);
-			float rightSample = mainBlock.getSample(1, i);
-
-			float leftSidechainSample = sidechainBlock.getSample(0, i);
-			float rightSidechainSample = sidechainBlock.getSample(1, i);
-
-			float resultLeftSample = leftSample + leftSidechainSample;
-			float resultRightSample = rightSample + rightSidechainSample;
-
-			mainBlock.setSample(0, i, resultLeftSample);
-			mainBlock.setSample(1, i, resultRightSample);
+			alertWindow = std::make_unique<juce::AlertWindow>("Sidechain Error", "Sidechain input not found", MessageBoxIconType::WarningIcon, nullptr);
+			alertWindow->showMessageBox(MessageBoxIconType::WarningIcon,"Sidechain Error", "Sidechain input not found", "OK");
+			applySidechain = false;
 		}
 	}
 }
