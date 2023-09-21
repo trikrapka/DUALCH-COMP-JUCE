@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="vpXkaU" name="DualChannel" projectType="audioplug" pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST3"
+<JUCERPROJECT id="vpXkaU" name="DualChannel" projectType="audioplug" pluginFormats="buildAU,buildStandalone,buildVST3"
               cppLanguageStandard="latest" reportAppUsage="0" displaySplashScreen="1"
-              jucerFormatVersion="1" defines="JUCE_MODAL_LOOPS_PERMITTED=1">
+              jucerFormatVersion="1" defines="JUCE_MODAL_LOOPS_PERMITTED=1"
+              version="1.0.0">
   <MAINGROUP id="LEzWVi" name="DualChannel">
     <GROUP id="{85ABA220-5DDF-78C0-699F-59C19B48E4B3}" name="Fonts">
       <FILE id="Mpl2lG" name="Roboto-Bold.ttf" compile="0" resource="1" file="Fonts/Roboto-Bold.ttf"/>
@@ -23,7 +24,6 @@
                 file="Source/dsp/include/LevelEnvelopeFollower.h"/>
           <FILE id="H0Erv2" name="MidsideProcessor.h" compile="0" resource="0"
                 file="Source/dsp/include/MidsideProcessor.h"/>
-          <FILE id="nq37o4" name="Oversampling.h" compile="0" resource="0" file="Source/dsp/include/Oversampling.h"/>
           <FILE id="nkbzt8" name="SmoothingFilter.h" compile="0" resource="0"
                 file="Source/dsp/include/SmoothingFilter.h"/>
         </GROUP>
@@ -36,8 +36,6 @@
               file="Source/dsp/LevelEnvelopeFollower.cpp"/>
         <FILE id="hmDmA5" name="MidsideProcessor.cpp" compile="1" resource="1"
               file="Source/dsp/MidsideProcessor.cpp"/>
-        <FILE id="WmxuAR" name="Oversampling.cpp" compile="1" resource="0"
-              file="Source/dsp/Oversampling.cpp"/>
         <FILE id="eui6b1" name="SmoothingFilter.cpp" compile="1" resource="0"
               file="Source/dsp/SmoothingFilter.cpp"/>
       </GROUP>

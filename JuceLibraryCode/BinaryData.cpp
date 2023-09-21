@@ -8196,7 +8196,7 @@ const char* RobotoRegular_ttf = (const char*) temp_binary_data_3;
 
 //================== MidsideProcessor.cpp ==================
 static const unsigned char temp_binary_data_4[] =
-"\xef\xbb\xbf#include \"include/MidSideProcessor.h\"\r\n"
+"#include \"include/MidSideProcessor.h\"\r\n"
 "\r\n"
 "MidSideProcessor::MidSideProcessor()\r\n"
 "{\r\n"
@@ -8270,7 +8270,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x5f707d58:  numBytes = 170012; return RobotoLight_ttf;
         case 0x318a2f61:  numBytes = 171656; return RobotoMedium_ttf;
         case 0x93fe9a1e:  numBytes = 171272; return RobotoRegular_ttf;
-        case 0x74f34337:  numBytes = 1809; return MidsideProcessor_cpp;
+        case 0x74f34337:  numBytes = 1806; return MidsideProcessor_cpp;
         default: break;
     }
 
