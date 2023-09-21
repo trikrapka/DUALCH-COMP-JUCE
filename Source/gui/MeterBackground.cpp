@@ -44,7 +44,7 @@ void MeterBackground::resized()
 void MeterBackground::drawIndicators(Graphics& g, float centreX, float centreY, float length)
 {
     const auto indices = (abs(maxValue - minValue) / step) + 1;
-    //DBG("Indices: " << indices);
+    DBG("Indices: " << indices);
     int val = minValue;
 
     for (int i = 0; i < indices; ++i)
@@ -64,7 +64,10 @@ void MeterBackground::drawIndicators(Graphics& g, float centreX, float centreY, 
         const float yCof = nY * 7;
 
         g.drawArrow({x2, y2, x2 - xCof, y2 - yCof}, 2.0f, 0, 0);
-        //g.drawSingleLineText(String(val), x2-5, y2);
+        
+        g.drawSingleLineText(String("80"), (centreX + 50), (centreY - 15));
+        g.drawSingleLineText(String("-80"), (centreX - 70), (centreY - 15));
+        g.drawSingleLineText(String("0"), (centreX - 3), (centreY - 65));
         val += step;
     }
 }
