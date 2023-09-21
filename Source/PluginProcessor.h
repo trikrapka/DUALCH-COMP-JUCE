@@ -84,6 +84,7 @@ public:
     float getRightGainReduction();
     
     bool applyLinking = false;
+    bool applySidechain = false;
 
 private:
     //==============================================================================
@@ -96,7 +97,6 @@ private:
     float lowPassValue = 6.0f;
     //==============================================================================
     bool applyLRMode = true;
-    bool applySidechain = false;
     bool applyOversampling = false;
     const AudioChannelSet sidechainInput;
     //==============================================================================

@@ -87,6 +87,7 @@ private:
     bool linkingApplied; //private bool to refer to applyLinking bool
     double clicked;
     bool isChannel1Active = true;
+    bool sidechainError = processor.applySidechain;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DualChannelAudioProcessorEditor)
 };

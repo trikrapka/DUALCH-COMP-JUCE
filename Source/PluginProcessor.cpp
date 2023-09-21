@@ -60,13 +60,7 @@ AudioProcessor::BusesProperties DualChannelAudioProcessor::makeBusesProperties()
 
 	bp.addBus(true, "Input", AudioChannelSet::stereo(), true);
 	bp.addBus(false, "Output", AudioChannelSet::stereo(), true);
-	
-    //TODO: delete comments
-	
-	//if (!JUCEApplicationBase::isStandaloneApp())
-	//{
-		bp.addBus(true, "Sidechain", AudioChannelSet::stereo(), true);
-	//}
+	bp.addBus(true, "Sidechain", AudioChannelSet::stereo(), true);
 
 	return bp;
 }
@@ -335,8 +329,11 @@ void DualChannelAudioProcessor::process(AudioBlock<float> block)
 			block.setSample(0, i, processedLeftSample);
 			block.setSample(1, i, processedRightSample);
 
-			leftGainReduction.set(Decibels::gainToDecibels(processedLeftSample / leftSample));
-			rightGainReduction.set(Decibels::gainToDecibels(processedRightSample / rightSample));
+			if (leftSample == 0) leftGainReduction.set(0);
+			else leftGainReduction.set(Decibels::gainToDecibels(processedLeftSample / leftSample));
+
+			if (rightSample == 0) rightGainReduction.set(0);
+			else rightGainReduction.set(Decibels::gainToDecibels(processedRightSample / rightSample));
 		}
 	}
 	else
@@ -421,10 +418,8 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	}
 
 	dryWetMixer.mixWetSamples(audioBlock);
-	
-    //TODO: delete comment
-	
-	if (applySidechain /*  && !JUCEApplicationBase::isStandaloneApp() */)
+
+	if (applySidechain)
 	{
 		AudioBuffer<float> sidechainBuffer = getBusBuffer(buffer, true, 1);
 		AudioBlock<float> sidechainBlock(sidechainBuffer);

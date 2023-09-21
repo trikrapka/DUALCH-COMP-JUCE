@@ -1,4 +1,4 @@
-﻿#include "include/MidSideProcessor.h"
+#include "include/MidSideProcessor.h"
 
 MidSideProcessor::MidSideProcessor()
 {

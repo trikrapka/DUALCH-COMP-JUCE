@@ -20,12 +20,12 @@ DualChannelAudioProcessorEditor::DualChannelAudioProcessorEditor(DualChannelAudi
     highPassToggle("HP"), lowPassToggle("LP"),
     sidechainSlider(this), sidechainToggle("Sidechain"),
     mixSlider(this),
-    lrToggle("MS mode"), linkingToggle("Linking"),
+    lrToggle("MidSide"), linkingToggle("Linking"),
     oversamplingComboBox("Oversampling factor"), oversamplingToggle("Oversampling")
 {
     setLookAndFeel(&LAF);
     initWidgets();
-    setSize(700, 600);
+    setSize(750, 600);
     startTimerHz(60);
     
     firstInputGainSlider.slider.addListener(this);
@@ -63,6 +63,12 @@ void DualChannelAudioProcessorEditor::timerCallback()
 
     leftGainMeter.update(leftGainReduction);
     rightGainMeter.update(rightGainReduction);
+    
+    if (!sidechainError)
+    {
+        sidechainError = false;
+        sidechainToggle.setToggleState(false, dontSendNotification);
+    } 
     
 }
 
