@@ -307,6 +307,18 @@ void decodeMSToLR(AudioBlock<float> block)
 	}
 }
 
+float calculateQFactor(float desiredDbOctave)
+{
+	if (desiredDbOctave == 6)
+		return 0.707f;
+	else if (desiredDbOctave == 12)
+		return 2.0f;
+	else if (desiredDbOctave == 18)
+		return 2.414f;
+	else
+		return 4.236f;
+}
+
 void DualChannelAudioProcessor::process(AudioBlock<float> block)
 {
 	const int numSamples = block.getNumSamples();
@@ -372,17 +384,21 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	AudioBuffer<float> mainBuffer = getBusBuffer(buffer, true, 0);
 	AudioBlock<float> audioBlock(mainBuffer);
 
-	dsp::ProcessorChain<dsp::IIR::Filter<float>, dsp::IIR::Filter<float>> filter;
-	Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR);
+	IIR::Filter<float> highPassFilter;
+	IIR::Filter<float> lowPassFilter;
+
+	Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandFIREquiripple);
 
 	if (applyHighPass)
 	{
-		filter.get<0>().coefficients = dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 20.0f, hightPassValue); // 20 Hz
+		float qFactor = calculateQFactor(hightPassValue);
+		highPassFilter.coefficients = IIR::Coefficients<float>::makeHighPass(sampleRate, 20.0f, qFactor); // 20 Hz
 	}
 
 	if (applyLowPass)
 	{
-		filter.get<1>().coefficients = dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, 10000.0f, lowPassValue); // 10 kHz
+		float qFactor = calculateQFactor(lowPassValue);
+		lowPassFilter.coefficients = IIR::Coefficients<float>::makeLowPass(sampleRate, 1000.0f, qFactor); // 10 kHz
 	}
 
 	dryWetMixer.pushDrySamples(audioBlock);
@@ -405,9 +421,14 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 		decodeMSToLR(audioBlock);
 	}
 
-	if (applyHighPass || applyLowPass)
+	if (applyHighPass)
 	{
-		filter.process(ProcessContextReplacing<float>(audioBlock));
+		highPassFilter.process(ProcessContextReplacing<float>(audioBlock));
+	}
+
+	if (applyLowPass)
+	{
+		lowPassFilter.process(ProcessContextReplacing<float>(audioBlock));
 	}
 
 	if (applyOversampling)
@@ -427,31 +448,31 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 		
 		auto sidechainInputs = sidechainBuffer.getNumChannels();
 		
-            if(sidechainInputs > 0)
-            {
-	            sidechainGainComputer.process(sidechainContextReplacing);
+		if (sidechainInputs > 0)
+		{
+			sidechainGainComputer.process(sidechainContextReplacing);
 
-            	AudioBlock<float> mainBlock(mainBuffer);
+			AudioBlock<float> mainBlock(mainBuffer);
 
-            	for (int i = 0; i < numSamples; i++)
-            	{
-            		float leftSample = mainBlock.getSample(0, i);
-            		float rightSample = mainBlock.getSample(1, i);
+			for (int i = 0; i < numSamples; i++)
+			{
+				float leftSample = mainBlock.getSample(0, i);
+				float rightSample = mainBlock.getSample(1, i);
 
-            		float leftSidechainSample = sidechainBlock.getSample(0, i);
-            		float rightSidechainSample = sidechainBlock.getSample(1, i);
+				float leftSidechainSample = sidechainBlock.getSample(0, i);
+				float rightSidechainSample = sidechainBlock.getSample(1, i);
 
-            		float resultLeftSample = leftSample + leftSidechainSample;
-            		float resultRightSample = rightSample + rightSidechainSample;
+				float resultLeftSample = leftSample + leftSidechainSample;
+				float resultRightSample = rightSample + rightSidechainSample;
 
-            		mainBlock.setSample(0, i, resultLeftSample);
-            		mainBlock.setSample(1, i, resultRightSample);
-            	}
-            }
+				mainBlock.setSample(0, i, resultLeftSample);
+				mainBlock.setSample(1, i, resultRightSample);
+			}
+		}
 		else
 		{
 			alertWindow = std::make_unique<juce::AlertWindow>("Sidechain Error", "Sidechain input not found", MessageBoxIconType::WarningIcon, nullptr);
-			alertWindow->showMessageBox(MessageBoxIconType::WarningIcon,"Sidechain Error", "Sidechain input not found", "OK");
+			alertWindow->showMessageBox(MessageBoxIconType::WarningIcon, "Sidechain Error", "Sidechain input not found", "OK");
 			applySidechain = false;
 		}
 	}
