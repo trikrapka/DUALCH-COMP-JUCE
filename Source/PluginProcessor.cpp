@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-	This file was auto-generated!
-
-	It contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "dsp/include/Compressor.h"
@@ -43,6 +33,9 @@ DualChannelAudioProcessor::DualChannelAudioProcessor()
 
 	parameters.addParameterListener("high_pass", this);
 	parameters.addParameterListener("low_pass", this);
+
+	parameters.addParameterListener("high_pass_freq_slider", this);
+	parameters.addParameterListener("low_pass_freq_slider",this);
 
 	parameters.addParameterListener("sidechain", this);
 
@@ -392,13 +385,13 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 	if (applyHighPass)
 	{
 		float qFactor = calculateQFactor(hightPassValue);
-		highPassFilter.coefficients = IIR::Coefficients<float>::makeHighPass(sampleRate, 20.0f, qFactor); // 20 Hz
+		highPassFilter.coefficients = IIR::Coefficients<float>::makeHighPass(sampleRate, cutoffFrquencyHP, qFactor);
 	}
 
 	if (applyLowPass)
 	{
 		float qFactor = calculateQFactor(lowPassValue);
-		lowPassFilter.coefficients = IIR::Coefficients<float>::makeLowPass(sampleRate, 1000.0f, qFactor); // 10 kHz
+		lowPassFilter.coefficients = IIR::Coefficients<float>::makeLowPass(sampleRate, cutoffFrquencyLP, qFactor); 
 	}
 
 	dryWetMixer.pushDrySamples(audioBlock);
@@ -528,6 +521,8 @@ void DualChannelAudioProcessor::parameterChanged(const String& parameterID, floa
 
 	else if (parameterID == "low_pass") lowPassValue = newValue;
 	else if (parameterID == "high_pass") hightPassValue = newValue;
+	else if (parameterID == "high_pass_freq_slider") cutoffFrquencyHP = newValue;
+	else if (parameterID == "low_pass_freq_slider") cutoffFrquencyLP = newValue;
 
 	else if (parameterID == "sidechain") sidechainGainComputer.setGainDecibels(newValue);
 
@@ -703,6 +698,28 @@ AudioProcessorValueTreeState::ParameterLayout DualChannelAudioProcessor::createP
 			return String(value, 1) + " db/Oct";
 		}));
 
+	params.push_back(std::make_unique<AudioParameterFloat>("high_pass_freq_slider", "hpFreqSlider",
+	NormalisableRange<float>(
+		Constants::Parameter::highPassFreqStart,
+		Constants::Parameter::highPassFreqEnd,
+		Constants::Parameter::highPassFreqInterval), 20.0f,
+	String(), AudioProcessorParameter::genericParameter,
+	[](float value, float)
+	{
+		return String(value, 1) + " Hz";
+	}));
+
+	params.push_back(std::make_unique<AudioParameterFloat>("low_pass_freq_slider", "lpFreqSlider",
+NormalisableRange<float>(
+	Constants::Parameter::lowPassFreqStart,
+	Constants::Parameter::lowPassFreqEnd,
+	Constants::Parameter::lowPassFreqInterval), 20.0f,
+String(), AudioProcessorParameter::genericParameter,
+[](float value, float)
+{
+	return String(value, 1) + " Hz";
+}));
+	
 	params.push_back(std::make_unique<AudioParameterFloat>("low_pass", "LP",
 		NormalisableRange<float>(
 			Constants::Parameter::lowPassStart,

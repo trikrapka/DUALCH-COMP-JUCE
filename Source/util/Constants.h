@@ -55,10 +55,18 @@ namespace Constants
         constexpr float highPassStart = 6.0f;
         constexpr float highPassEnd = 24.0f;
         constexpr float highPassInterval = 6.0f;
+        
+        constexpr float highPassFreqStart = 20.0f;
+        constexpr float highPassFreqEnd = 20000.0f;
+        constexpr float highPassFreqInterval = 1.0f;
 
         constexpr float lowPassStart = 6.0f;
         constexpr float lowPassEnd = 24.0f;
         constexpr float lowPassInterval = 6.0f;
+
+        constexpr float lowPassFreqStart = 20.0f;
+        constexpr float lowPassFreqEnd = 20000.0f;
+        constexpr float lowPassFreqInterval = 1.0f;
 
         constexpr float sidechainStart = 0.0f;
         constexpr float sidechainEnd = 80.0f;

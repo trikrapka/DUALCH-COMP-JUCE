@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -85,6 +75,8 @@ public:
     
     bool applyLinking = false;
     bool applySidechain = false;
+    float cutoffFrquencyHP;
+    float cutoffFrquencyLP;
 
 private:
     //==============================================================================
@@ -95,6 +87,8 @@ private:
     //==============================================================================
     float hightPassValue = 6.0f;
     float lowPassValue = 6.0f;
+    float highPassFreqValue = 20.0f;
+    float lowPassFreqValue = 20.0f;
     //==============================================================================
     bool applyLRMode = true;
     bool applyOversampling = false;

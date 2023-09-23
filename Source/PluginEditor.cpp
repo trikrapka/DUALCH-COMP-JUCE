@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic framework code for a JUCE plugin editor.
-
-  ==============================================================================
-*/
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -21,11 +11,11 @@ DualChannelAudioProcessorEditor::DualChannelAudioProcessorEditor(DualChannelAudi
     sidechainSlider(this), sidechainToggle("Sidechain"),
     mixSlider(this),
     lrToggle("MidSide"), linkingToggle("Linking"),
-    oversamplingComboBox("Oversampling factor"), oversamplingToggle("Oversampling")
+    oversamplingComboBox("Oversampling factor"), oversamplingToggle("Oversampling"), lowPassFreqSlider(this), highPassFreqSlider(this)
 {
     setLookAndFeel(&LAF);
     initWidgets();
-    setSize(750, 600);
+    setSize(900, 600);
     startTimerHz(60);
     
     firstInputGainSlider.slider.addListener(this);
@@ -131,9 +121,11 @@ void DualChannelAudioProcessorEditor::resized()
     filterButtonsBox.flexDirection = FlexBox::Direction::row;
     filterButtonsBox.justifyContent = FlexBox::JustifyContent::spaceAround;
 
+    filterButtonsBox.items.add(FlexItem(highPassFreqSlider).withFlex(0.6).withMargin(knobMarginSmall));
     filterButtonsBox.items.add(FlexItem(highPassSlider).withFlex(1).withMargin(knobMarginSmall));
     filterButtonsBox.items.add(FlexItem(highPassToggle).withFlex(1).withMargin(knobMarginSmall));
 
+    filterButtonsBox.items.add(FlexItem(lowPassFreqSlider).withFlex(0.6).withMargin(knobMarginSmall));
     filterButtonsBox.items.add(FlexItem(lowPassSlider).withFlex(1).withMargin(knobMarginSmall));
     filterButtonsBox.items.add(FlexItem(lowPassToggle).withFlex(1).withMargin(knobMarginSmall));
 
@@ -307,14 +299,14 @@ void DualChannelAudioProcessorEditor::initWidgets()
 
     addAndMakeVisible(highPassSlider);
     highPassSlider.reset(valueTreeState, "high_pass");
-    highPassSlider.setLabelText("HP");
+    highPassSlider.setLabelText("Slope");
 
     addAndMakeVisible(highPassToggle);
     highPassToggle.addListener(this);
 
     addAndMakeVisible(lowPassSlider);
     lowPassSlider.reset(valueTreeState, "low_pass");
-    lowPassSlider.setLabelText("LP");
+    lowPassSlider.setLabelText("Slope");
 
     addAndMakeVisible(lowPassToggle);
     lowPassToggle.addListener(this);
@@ -345,4 +337,11 @@ void DualChannelAudioProcessorEditor::initWidgets()
 
     addAndMakeVisible(oversamplingToggle);
     oversamplingToggle.addListener(this);
+
+    addAndMakeVisible(lowPassFreqSlider);
+    highPassFreqSlider.reset(valueTreeState, "high_pass_freq_slider");
+    highPassFreqSlider.setLabelText("Cutoff");
+    addAndMakeVisible(highPassFreqSlider);
+    lowPassFreqSlider.reset(valueTreeState, "low_pass_freq_slider");
+    lowPassFreqSlider.setLabelText("Cutoff");
 }

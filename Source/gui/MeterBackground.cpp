@@ -67,7 +67,7 @@ void MeterBackground::drawIndicators(Graphics& g, float centreX, float centreY, 
         
         g.drawSingleLineText(String("80"), (centreX + 50), (centreY - 15));
         g.drawSingleLineText(String("-80"), (centreX - 70), (centreY - 15));
-        g.drawSingleLineText(String("0"), (centreX - 3), (centreY - 65));
+        g.drawSingleLineText(String("0"), (centreX - 3.5), (centreY - 65));
         val += step;
     }
 }
