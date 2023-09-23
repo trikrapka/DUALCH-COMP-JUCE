@@ -454,13 +454,6 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 		decodeMSToLR(audioBlock);
 	}
 
-	if (applyOversampling)
-	{
-		AudioBlock<float> downsampledBlock(mainBuffer);
-		oversampling.processSamplesDown(downsampledBlock);
-		audioBlock.swap(downsampledBlock);
-	}
-
 	dryWetMixer.mixWetSamples(audioBlock);
 
 	if (applySidechain)
