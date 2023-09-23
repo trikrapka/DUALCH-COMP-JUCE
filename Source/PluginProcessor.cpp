@@ -471,7 +471,7 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 		
 		auto sidechainInputs = sidechainBuffer.getNumChannels();
 		
-		if (sidechainInputs > 0)
+		if (sidechainInputs != 0)
 		{
 			sidechainGainComputer.process(sidechainContextReplacing);
 

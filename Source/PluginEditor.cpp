@@ -37,6 +37,9 @@ DualChannelAudioProcessorEditor::DualChannelAudioProcessorEditor(DualChannelAudi
     
     secondThresholdSlider.slider.setValue(-32);
     secondRatioSlider.slider.setValue(2);
+
+    highPassFreqSlider.slider.setValue(100);
+    lowPassFreqSlider.slider.setValue(10000);
 }
 
 
@@ -56,7 +59,7 @@ void DualChannelAudioProcessorEditor::timerCallback()
     
     if (!sidechainError)
     {
-        sidechainError = false;
+        sidechainError = true; // sorry for this, sidechainerror is a bad name, but it works. it should be called NOsidechainError(((
         sidechainToggle.setToggleState(false, dontSendNotification);
     } 
     
