@@ -29,15 +29,6 @@ void GainComputer::setRatio(float newRatio)
     }
 }
 
-void GainComputer::setKnee(float newKnee)
-{
-    if (newKnee != knee)
-    {
-        knee = newKnee;
-        kneeHalf = newKnee / 2.0f;
-    }
-}
-
 float GainComputer::applyCompression(float& input)
 {
     const float overshoot = input - threshold;

@@ -1,26 +1,16 @@
 
 #pragma once
 
-/* GainComputer Class:
- * Calculates the needed attenuation to compress a signal with given characteristics
- */
+
 class GainComputer
 {
 public:
 
     GainComputer();
-
-    // Sets the threshold in dB
+    
     void setThreshold(float);
-
-    // Sets the ratio in dB
     void setRatio(float);
-
-    // Sets the knee-width in dB (if > 0, 2nd order interpolation for soft knee)
-    void setKnee(float);
-
-    // Applies characteristics to a given sample
-    // returns attenuation
+    
     float applyCompression(float&);
 
     void applyCompressionToBuffer(float*, int);

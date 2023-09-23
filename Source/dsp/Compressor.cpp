@@ -1,10 +1,9 @@
-/* Compressor-Class:
-* The circruit is modeled after the "ideal" VCA-Compressor
- * based on the paper "Digital Dynamic Range Compressor Design Tutorial and Analysis"
- * by Giannoulis, Massberg & Reiss
- */
 
 #include "include/Compressor.h"
+
+
+// Based on https://www.eecs.qmul.ac.uk/~josh/documents/2012/GiannoulisMassbergReiss-dynamicrangecompression-JAES2012.pdf
+
 
 Compressor::~Compressor()
 {
@@ -44,11 +43,6 @@ void Compressor::setRelease(float releaseTimeInMs)
 void Compressor::setRatio(float rat)
 {
     gainComputer.setRatio(rat);
-}
-
-void Compressor::setKnee(float kneeInDb)
-{
-    gainComputer.setKnee(kneeInDb);
 }
 
 void Compressor::setThreshold(float thresholdInDb)
