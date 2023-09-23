@@ -89,8 +89,8 @@ private:
     //==============================================================================
     float hightPassValue = 6.0f;
     float lowPassValue = 6.0f;
-    float highPassFreqValue = 20.0f;
-    float lowPassFreqValue = 20.0f;
+    float highPassFreqValue = 100.0f;
+    float lowPassFreqValue = 10000.0f;
     //==============================================================================
     bool applyLRMode = true;
     bool applyOversampling = false;
