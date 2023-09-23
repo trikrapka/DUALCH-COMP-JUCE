@@ -104,12 +104,17 @@ private:
     Gain<float> leftOutputGainComputer;
     Gain<float> rightOutputGainComputer;
     Gain<float> sidechainGainComputer;
-    Compressor<float> leftCompressor;
-    Compressor<float> rightCompressor;
+    dsp::Compressor<float> leftCompressor;
+    dsp::Compressor<float> rightCompressor;
 
     Gain<float> linkInputGainComputer;
     Gain<float> linkOutputGainComputer;
-    Compressor<float> linkCompressor;
+    dsp::Compressor<float> linkCompressor;
+
+    IIR::Filter<float> leftHighPassFilter;
+    IIR::Filter<float> rightHighPassFilter;
+    IIR::Filter<float> leftLowPassFilter;
+    IIR::Filter<float> rightLowPassFilter;
 
     DryWetMixer<float> dryWetMixer;
     //==============================================================================

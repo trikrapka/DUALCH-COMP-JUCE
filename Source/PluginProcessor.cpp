@@ -14,7 +14,9 @@ DualChannelAudioProcessor::DualChannelAudioProcessor()
 	linkInputGainComputer(), linkOutputGainComputer(),
 	linkCompressor(),
 	dryWetMixer(),
-	leftGainReduction(0.0f), rightGainReduction(0.0f)
+	leftGainReduction(0.0f), rightGainReduction(0.0f),
+	leftHighPassFilter(), rightHighPassFilter(),
+	leftLowPassFilter(), rightLowPassFilter()
 #endif
 {
 	parameters.addParameterListener("f_inputgain", this);
@@ -370,32 +372,58 @@ void DualChannelAudioProcessor::process(AudioBlock<float> block)
 
 void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-	ScopedNoDenormals noDenormals;
+	//ScopedNoDenormals noDenormals;
 	const int numSamples = buffer.getNumSamples();
 	const double sampleRate = getSampleRate();
 
 	AudioBuffer<float> mainBuffer = getBusBuffer(buffer, true, 0);
 	AudioBlock<float> audioBlock(mainBuffer);
 
-	IIR::Filter<float> highPassFilter;
-	IIR::Filter<float> lowPassFilter;
-
-	Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandFIREquiripple);
-
 	if (applyHighPass)
 	{
 		float qFactor = calculateQFactor(hightPassValue);
-		highPassFilter.coefficients = IIR::Coefficients<float>::makeHighPass(sampleRate, cutoffFrquencyHP, qFactor);
+		auto coefficients = IIR::Coefficients<float>::makeHighPass(sampleRate, cutoffFrquencyHP, qFactor);
+		
+		leftHighPassFilter.coefficients = coefficients;
+		rightHighPassFilter.coefficients = coefficients;
+		
+		for (int i = 0; i < numSamples; i++)
+		{
+			float leftSample = audioBlock.getSample(0, i);
+			float rightSample = audioBlock.getSample(1, i);
+
+			float processedLeftSample = leftHighPassFilter.processSample(leftSample);
+			float processedRightSample = rightHighPassFilter.processSample(rightSample);
+
+			audioBlock.setSample(0, i, processedLeftSample);
+			audioBlock.setSample(1, i, processedRightSample);
+		}
 	}
 
 	if (applyLowPass)
 	{
 		float qFactor = calculateQFactor(lowPassValue);
-		lowPassFilter.coefficients = IIR::Coefficients<float>::makeLowPass(sampleRate, cutoffFrquencyLP, qFactor); 
+		auto coefficients = IIR::Coefficients<float>::makeLowPass(sampleRate, cutoffFrquencyLP, qFactor);
+		
+		leftLowPassFilter.coefficients = coefficients;
+		rightLowPassFilter.coefficients = coefficients;
+
+		for (int i = 0; i < numSamples; i++)
+		{
+			float leftSample = audioBlock.getSample(0, i);
+			float rightSample = audioBlock.getSample(1, i);
+
+			float processedLeftSample = leftLowPassFilter.processSample(leftSample);
+			float processedRightSample = rightLowPassFilter.processSample(rightSample);
+
+			audioBlock.setSample(0, i, processedLeftSample);
+			audioBlock.setSample(1, i, processedRightSample);
+		}
 	}
 
 	dryWetMixer.pushDrySamples(audioBlock);
 
+	Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandFIREquiripple);
 	if (applyOversampling)
 	{
 		oversampling.initProcessing(numSamples);
@@ -412,16 +440,6 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 		encodeLRToMS(audioBlock);
 		process(audioBlock);
 		decodeMSToLR(audioBlock);
-	}
-
-	if (applyHighPass)
-	{
-		highPassFilter.process(ProcessContextReplacing<float>(audioBlock));
-	}
-
-	if (applyLowPass)
-	{
-		lowPassFilter.process(ProcessContextReplacing<float>(audioBlock));
 	}
 
 	if (applyOversampling)
