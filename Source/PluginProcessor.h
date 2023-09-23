@@ -55,6 +55,8 @@ public:
     void parameterChanged(const String& parameterID, float newValue) override;
     AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
+    void processLP(AudioBlock<float> audioBlock);
+    void processHP(AudioBlock<float> audioBlock);
     void process(AudioBlock<float> block);
 
     //==============================================================================
