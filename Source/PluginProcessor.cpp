@@ -323,6 +323,9 @@ void DualChannelAudioProcessor::processLP(AudioBlock<float> audioBlock)
 	leftLowPassFilter.coefficients = coefficients;
 	rightLowPassFilter.coefficients = coefficients;
 
+	leftLowPassFilter.reset();
+	rightLowPassFilter.reset();
+
 	for (int i = 0; i < numSamples; i++)
 	{
 		float leftSample = audioBlock.getSample(0, i);
@@ -330,6 +333,9 @@ void DualChannelAudioProcessor::processLP(AudioBlock<float> audioBlock)
 
 		float processedLeftSample = leftLowPassFilter.processSample(leftSample);
 		float processedRightSample = rightLowPassFilter.processSample(rightSample);
+
+		leftLowPassFilter.snapToZero();
+		rightLowPassFilter.snapToZero();
 
 		audioBlock.setSample(0, i, processedLeftSample);
 		audioBlock.setSample(1, i, processedRightSample);
@@ -345,6 +351,9 @@ void DualChannelAudioProcessor::processHP(AudioBlock<float> audioBlock)
 	leftHighPassFilter.coefficients = coefficients;
 	rightHighPassFilter.coefficients = coefficients;
 
+	leftHighPassFilter.reset();
+	rightHighPassFilter.reset();
+
 	for (int i = 0; i < numSamples; i++)
 	{
 		float leftSample = audioBlock.getSample(0, i);
@@ -352,6 +361,9 @@ void DualChannelAudioProcessor::processHP(AudioBlock<float> audioBlock)
 
 		float processedLeftSample = leftHighPassFilter.processSample(leftSample);
 		float processedRightSample = rightHighPassFilter.processSample(rightSample);
+
+		leftHighPassFilter.snapToZero();
+		rightHighPassFilter.snapToZero();
 
 		audioBlock.setSample(0, i, processedLeftSample);
 		audioBlock.setSample(1, i, processedRightSample);
@@ -416,29 +428,21 @@ void DualChannelAudioProcessor::process(AudioBlock<float> block)
 
 void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-	//ScopedNoDenormals noDenormals;
+	ScopedNoDenormals noDenormals;
 	const int numSamples = buffer.getNumSamples();
 	const double sampleRate = getSampleRate();
 
 	AudioBuffer<float> mainBuffer = getBusBuffer(buffer, true, 0);
 	AudioBlock<float> audioBlock(mainBuffer);
 
-	if (applyHighPass)
-	{
-		processHP(audioBlock);
-	}
-
-	if (applyLowPass)
-	{
-		processLP(audioBlock);
-	}
-
 	dryWetMixer.pushDrySamples(audioBlock);
 
-	Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandFIREquiripple);
+	Oversampling<float> oversampling(2, oversamplingFactor, Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR);
+
 	if (applyOversampling)
 	{
 		oversampling.initProcessing(numSamples);
+		oversampling.reset();
 		AudioBlock<float> upsampledBlock = oversampling.processSamplesUp(mainBuffer);
 		audioBlock.swap(upsampledBlock);
 	}
@@ -452,6 +456,23 @@ void DualChannelAudioProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuf
 		encodeLRToMS(audioBlock);
 		process(audioBlock);
 		decodeMSToLR(audioBlock);
+	}
+
+	if (applyHighPass)
+	{
+		processHP(audioBlock);
+	}
+
+	if (applyLowPass)
+	{
+		processLP(audioBlock);
+	}
+
+	if (applyOversampling)
+	{
+		AudioBlock<float> downsampledBlock(mainBuffer);
+		oversampling.processSamplesDown(downsampledBlock);
+		audioBlock.swap(downsampledBlock);
 	}
 
 	dryWetMixer.mixWetSamples(audioBlock);
@@ -722,27 +743,27 @@ AudioProcessorValueTreeState::ParameterLayout DualChannelAudioProcessor::createP
 		}));
 
 	params.push_back(std::make_unique<AudioParameterFloat>("high_pass_freq_slider", "hpFreqSlider",
-	NormalisableRange<float>(
-		Constants::Parameter::highPassFreqStart,
-		Constants::Parameter::highPassFreqEnd,
-		Constants::Parameter::highPassFreqInterval), 20.0f,
-	String(), AudioProcessorParameter::genericParameter,
-	[](float value, float)
-	{
-		return String(value, 1) + " Hz";
-	}));
+		NormalisableRange<float>(
+			Constants::Parameter::highPassFreqStart,
+			Constants::Parameter::highPassFreqEnd,
+			Constants::Parameter::highPassFreqInterval), 20.0f,
+		String(), AudioProcessorParameter::genericParameter,
+		[](float value, float)
+		{
+			return String(value, 1) + " Hz";
+		}));
 
 	params.push_back(std::make_unique<AudioParameterFloat>("low_pass_freq_slider", "lpFreqSlider",
-NormalisableRange<float>(
-	Constants::Parameter::lowPassFreqStart,
-	Constants::Parameter::lowPassFreqEnd,
-	Constants::Parameter::lowPassFreqInterval), 20.0f,
-String(), AudioProcessorParameter::genericParameter,
-[](float value, float)
-{
-	return String(value, 1) + " Hz";
-}));
-	
+		NormalisableRange<float>(
+			Constants::Parameter::lowPassFreqStart,
+			Constants::Parameter::lowPassFreqEnd,
+			Constants::Parameter::lowPassFreqInterval), 20.0f,
+		String(), AudioProcessorParameter::genericParameter,
+		[](float value, float)
+		{
+			return String(value, 1) + " Hz";
+		}));
+
 	params.push_back(std::make_unique<AudioParameterFloat>("low_pass", "LP",
 		NormalisableRange<float>(
 			Constants::Parameter::lowPassStart,
