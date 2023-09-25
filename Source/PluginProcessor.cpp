@@ -126,7 +126,7 @@ void DualChannelAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 {
 	ProcessSpec spec1{};
 	spec1.sampleRate = sampleRate;
-	spec1.numChannels = 3;
+	spec1.numChannels = 1;
 	spec1.maximumBlockSize = samplesPerBlock;
 
 	leftInputGainComputer.prepare(spec1);
@@ -139,7 +139,7 @@ void DualChannelAudioProcessor::prepareToPlay(double sampleRate, int samplesPerB
 
 	ProcessSpec spec2{};
 	spec2.sampleRate = sampleRate;
-	spec2.numChannels = 4;
+	spec2.numChannels = 2;
 	spec2.maximumBlockSize = samplesPerBlock;
 
 	linkInputGainComputer.prepare(spec2);
