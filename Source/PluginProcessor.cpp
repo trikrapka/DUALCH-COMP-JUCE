@@ -1,6 +1,5 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "dsp/include/Compressor.h"
 
 //==============================================================================
 DualChannelAudioProcessor::DualChannelAudioProcessor()

@@ -20,11 +20,8 @@ namespace BinaryData
     extern const char*   RobotoRegular_ttf;
     const int            RobotoRegular_ttfSize = 171272;
 
-    extern const char*   MidsideProcessor_cpp;
-    const int            MidsideProcessor_cppSize = 1806;
-
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 5;
+    const int namedResourceListSize = 4;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

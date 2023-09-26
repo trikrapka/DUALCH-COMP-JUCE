@@ -15,30 +15,6 @@
             file="Fonts/Roboto-Regular.ttf"/>
     </GROUP>
     <GROUP id="{5A0EF8AE-8D06-47C2-3355-D47D53C81E0D}" name="Source">
-      <GROUP id="{568E9E03-2250-C4A0-AE00-0C5CCCDA100C}" name="dsp">
-        <GROUP id="{A249D4C9-E975-7588-DD37-C7FBCC42B456}" name="include">
-          <FILE id="Rw3FZc" name="Compressor.h" compile="0" resource="0" file="Source/dsp/include/Compressor.h"/>
-          <FILE id="RG1lNl" name="GainComputer.h" compile="0" resource="0" file="Source/dsp/include/GainComputer.h"/>
-          <FILE id="NMKNPo" name="LevelDetector.h" compile="0" resource="0" file="Source/dsp/include/LevelDetector.h"/>
-          <FILE id="c4mthC" name="LevelEnvelopeFollower.h" compile="0" resource="0"
-                file="Source/dsp/include/LevelEnvelopeFollower.h"/>
-          <FILE id="H0Erv2" name="MidsideProcessor.h" compile="0" resource="0"
-                file="Source/dsp/include/MidsideProcessor.h"/>
-          <FILE id="nkbzt8" name="SmoothingFilter.h" compile="0" resource="0"
-                file="Source/dsp/include/SmoothingFilter.h"/>
-        </GROUP>
-        <FILE id="y710ud" name="Compressor.cpp" compile="1" resource="0" file="Source/dsp/Compressor.cpp"/>
-        <FILE id="GoEPbR" name="GainComputer.cpp" compile="1" resource="0"
-              file="Source/dsp/GainComputer.cpp"/>
-        <FILE id="OSm4JR" name="LevelDetector.cpp" compile="1" resource="0"
-              file="Source/dsp/LevelDetector.cpp"/>
-        <FILE id="N8Beap" name="LevelEnvelopeFollower.cpp" compile="1" resource="0"
-              file="Source/dsp/LevelEnvelopeFollower.cpp"/>
-        <FILE id="hmDmA5" name="MidsideProcessor.cpp" compile="1" resource="1"
-              file="Source/dsp/MidsideProcessor.cpp"/>
-        <FILE id="eui6b1" name="SmoothingFilter.cpp" compile="1" resource="0"
-              file="Source/dsp/SmoothingFilter.cpp"/>
-      </GROUP>
       <GROUP id="{3111DD47-F512-FEB1-37C2-9B52C07285D2}" name="gui">
         <GROUP id="{8A7FDE73-851E-F2D1-D74B-031974A751FA}" name="include">
           <FILE id="DI997s" name="LabeledSlider.h" compile="0" resource="0" file="Source/gui/include/LabeledSlider.h"/>

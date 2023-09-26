@@ -8194,66 +8194,6 @@ static const unsigned char temp_binary_data_3[] =
 
 const char* RobotoRegular_ttf = (const char*) temp_binary_data_3;
 
-//================== MidsideProcessor.cpp ==================
-static const unsigned char temp_binary_data_4[] =
-"#include \"include/MidSideProcessor.h\"\r\n"
-"\r\n"
-"MidSideProcessor::MidSideProcessor()\r\n"
-"{\r\n"
-"}\r\n"
-"\r\n"
-"void MidSideProcessor::prepare(const juce::dsp::ProcessSpec& spec)\r\n"
-"{\r\n"
-"    midSideBuffer.setSize(2, spec.maximumBlockSize);\r\n"
-"    lrCompressor.prepare(spec);  // Prepare the compressor for LR channels\r\n"
-"    msCompressor.prepare(spec);  // Prepare the compressor for MS channels\r\n"
-"}\r\n"
-"\r\n"
-"void MidSideProcessor::processLR\r\n"
-"(AudioBuffer<float>& buffer)\r\n"
-"{\r\n"
-"    const int numSamples = buffer.getNumSamples();\r\n"
-"\r\n"
-"    // Process LR channels using the compressor\r\n"
-"    for (int channel = 0; channel < 2; ++channel)\r\n"
-"    {\r\n"
-"        AudioBuffer<float> tempBuffer(1, numSamples); // Temporary buffer for a single channel\r\n"
-"        tempBuffer.copyFrom(0, 0, buffer, channel, 0, numSamples); // Copy channel data to temporary buffer\r\n"
-"        lrCompressor.process(tempBuffer, numSamples); // Process the single channel\r\n"
-"        buffer.copyFrom(channel, 0, tempBuffer, 0, 0, numSamples); // Copy processed data back to original buffer\r\n"
-"    }\r\n"
-"}\r\n"
-"\r\n"
-"void MidSideProcessor::processMS(AudioBuffer<float>& buffer)\r\n"
-"{\r\n"
-"    const int numSamples = buffer.getNumSamples();\r\n"
-"    const int numChannels = buffer.getNumChannels();\r\n"
-"\r\n"
-"    // Split LR channels to MS channels\r\n"
-"    for (int channel = 0; channel < numChannels; ++channel)\r\n"
-"    {\r\n"
-"        midSideBuffer.copyFrom(channel, 0, buffer, channel, 0, numSamples);\r\n"
-"    }\r\n"
-"\r\n"
-"    // Process MS channels using the compressor\r\n"
-"    msCompressor.process(midSideBuffer, numSamples); // Pass the appropriate number of arguments\r\n"
-"\r\n"
-"    // Convert MS channels back to LR channels\r\n"
-"    for (int channel = 0; channel < numChannels; ++channel)\r\n"
-"    {\r\n"
-"        buffer.copyFrom(channel, 0, midSideBuffer, channel, 0, numSamples);\r\n"
-"    }\r\n"
-"}\r\n"
-"\r\n"
-"\r\n"
-"void MidSideProcessor::reset()\r\n"
-"{\r\n"
-"    midSideBuffer.clear();\r\n"
-"}\r\n"
-"\r\n";
-
-const char* MidsideProcessor_cpp = (const char*) temp_binary_data_4;
-
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes);
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
@@ -8270,7 +8210,6 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x5f707d58:  numBytes = 170012; return RobotoLight_ttf;
         case 0x318a2f61:  numBytes = 171656; return RobotoMedium_ttf;
         case 0x93fe9a1e:  numBytes = 171272; return RobotoRegular_ttf;
-        case 0x74f34337:  numBytes = 1806; return MidsideProcessor_cpp;
         default: break;
     }
 
@@ -8283,8 +8222,7 @@ const char* namedResourceList[] =
     "RobotoBold_ttf",
     "RobotoLight_ttf",
     "RobotoMedium_ttf",
-    "RobotoRegular_ttf",
-    "MidsideProcessor_cpp"
+    "RobotoRegular_ttf"
 };
 
 const char* originalFilenames[] =
@@ -8292,8 +8230,7 @@ const char* originalFilenames[] =
     "Roboto-Bold.ttf",
     "Roboto-Light.ttf",
     "Roboto-Medium.ttf",
-    "Roboto-Regular.ttf",
-    "MidsideProcessor.cpp"
+    "Roboto-Regular.ttf"
 };
 
 const char* getNamedResourceOriginalFilename (const char* resourceNameUTF8);
